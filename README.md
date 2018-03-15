@@ -1,11 +1,11 @@
 # ComfortinoA7
 
-You can order your Comfortino modules at www.comfortino.eu
+##You can order your Comfortino modules at www.comfortino.eu##
 
 
-A7 GPS + GSM Arduino Libraries
-For use with official Comfortino modules only. 
-Do not redistribute, property of JMLABS Sp. z o.o.
+**A7 GPS + GSM Arduino Libraries.
+For use with official Comfortino modules only.
+Do not redistribute, property of JMLABS Sp. z o.o.**
 
 // SIMPLE EXAMPLE LIBRARY FOR COMFORTINO A7 GSM+GPS MODULE
 // USE SERIAL COMMANDS TO CONTROL:
@@ -30,5 +30,3 @@ Do not redistribute, property of JMLABS Sp. z o.o.
 // V:0-1  will set verbose mode
 // V:0 be quiet
 // V:1 beep buzzer if communication with modem is active - good for debugging
- 
-
