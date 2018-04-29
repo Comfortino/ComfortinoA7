@@ -38,6 +38,11 @@ float cA7getgpslon();
 char cA7getgpslatNS();
 int cA7getgpstime();
 float cA7getgpslat();
+String cA7getmcc();
+String cA7getmcn();
+String cA7getcid();
+String cA7getlac();
+int cA7getsignal();
 
   private:
 void buildclass();

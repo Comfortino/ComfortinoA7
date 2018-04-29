@@ -21,9 +21,9 @@ int A7setmode = 0;
 int A7currentmode = -99;
 int gpstime = 0;
 float gpslat =0;
-char gpslatNS = "";
+char gpslatNS = '0';
 float gpslon =0;
-char gpslonEW ="";
+char gpslonEW ='0';
 int gpssatno = 0;
 int gpsalt = 0;
 String lastGPGAA = "";
@@ -96,7 +96,7 @@ delay(pdelay);
 
 void Comfortinoa7::buildclass()
 {
-httpheader += "POST ";
+httpheader = "POST ";
 httpheader += subfolder;
 httpheader += " HTTP/1.1\r\nHost:  ";
 httpheader += host;
@@ -107,7 +107,7 @@ cipstartcnt = "\"TCP\",\"";
 cipstartcnt += host;
 cipstartcnt += "\",";
 cipstartcnt += port;
-cgdcont += "1,\"IP\",\"";
+cgdcont = "1,\"IP\",\"";
 cgdcont += ap;
 cgdcont += "\"";
 }
@@ -248,7 +248,7 @@ if ((A7currentmode !=6) and (A7setmode>=4))
 void Comfortinoa7::processA7line(String linebuffer){        // HANDLE RESPONSES FROM A7 MODEM
   
     // UPDATE PARAMS
-  if (linebuffer.indexOf("^CINIT:") != -1) A7currentmode = 0;
+  if (linebuffer.indexOf("^CINIT:") != -1) { A7currentmode = 0; Serial1.println("AT&F"); delay(500); Serial1.println("AT&F0"); delay(500); }
   if (linebuffer.indexOf("+CSQ:") != -1) {
     if (linebuffer.substring(6,linebuffer.indexOf(",")).toInt() == 0)
     {
@@ -284,7 +284,7 @@ void Comfortinoa7::processA7line(String linebuffer){        // HANDLE RESPONSES 
   if (linebuffer.indexOf("+CREG: 1/r") != -1) { A7currentmode = 1; CREGcounter=999; }
   if (linebuffer.indexOf("+CREG: 0") != -1) { A7currentmode = 0; }
   if (linebuffer.indexOf("+CIPRCV") != -1) lastresponsecode = linebuffer.substring(linebuffer.indexOf("+CIPRCV")+21,linebuffer.indexOf("+CIPRCV")+24).toInt();
-  if ((linebuffer.indexOf(">") != -1) and (A7setmode>=4))  {A7currentmode = 6; if (httpmsg!="") postHTTP(httpmsg);}
+  if ((linebuffer.indexOf(">") != -1) and (A7setmode>=4))  {A7currentmode = 6;}
   if (linebuffer.indexOf("+CREG: 1,") != -1) Serial1.println("AT+CREG=2");
   if (linebuffer.indexOf("+CGATT:0") != -1) Serial1.println("AT+CGATT=1");
   if (linebuffer.indexOf("+CGACT: 0,0") != -1) {
@@ -315,8 +315,8 @@ if (debugmode>=0) Serial.println("::::::::::::C:");
 String newserial = cmdbuffer.substring(cmdbuffer.indexOf("S:")+2,cmdbuffer.length());
 newserial.trim();
 {
-if (debugmode>=0) Serial.println("::::::::::::SETTING NEW MSG TO TRANSMIT");
-httpmsg=newserial;
+if (debugmode>=0) Serial.println("::::::::::::sending sms");
+sendsms(smsno,newserial);
 }
 }
 
@@ -372,15 +372,20 @@ getgps();
 
 void Comfortinoa7::sendsms (String no, String text)
 {
+    A7incominghttp=true;
 Serial1.print("AT+CMGF=1\r");
 delay(1000);
 Serial1.print("AT+CMGS=\"");
 Serial1.print(no);
 Serial1.print("\"\r");
 delay(500);
-Serial1.print("text\r");
+
+Serial1.print(text);
+Serial1.print("\r");
 delay(500);
 Serial1.write(0x1A);
+delay(500);
+A7incominghttp=false;
 }
 
 
@@ -406,30 +411,35 @@ A7currentmode = 4;
   int Comfortinoa7::cA7sethost(String parameter)
   {
     host = parameter;
+    buildclass();
     return 1; 
   }
 
   int Comfortinoa7::cA7setport(String parameter)
   {
     port = parameter;
+    buildclass();
     return 1; 
   }
 
 int Comfortinoa7::cA7setsubfolder(String parameter)
   {
     subfolder = parameter;
+    buildclass();
     return 1; 
   }
 
 int Comfortinoa7::cA7setuseragent(String parameter)
   {
     useragent = parameter;
+    buildclass();
     return 1; 
   }
 
 int Comfortinoa7::cA7setap(String parameter)
   {
     ap = parameter;
+    buildclass();
     return 1; 
   }
 
@@ -469,6 +479,32 @@ int Comfortinoa7::cA7logdata(String parameter)
   
  }
 
+ String Comfortinoa7::cA7getmcc()
+ {
+ return A7currentnetwork.substring(3,10);
+}
+
+ String Comfortinoa7::cA7getmcn()
+ {
+ return A7currentnetwork.substring(0,3);
+}
+
+ String Comfortinoa7::cA7getcid()
+ {
+ return A7currentcell;
+}
+
+ String Comfortinoa7::cA7getlac()
+ {
+ return A7currentarea;
+}
+
+ int Comfortinoa7::cA7getsignal()
+ {
+ return A7currentsignal;
+}
+
+ 
  String Comfortinoa7::cA7rreturnlastresponse()
  {
   String repfullresp = fullresp;
