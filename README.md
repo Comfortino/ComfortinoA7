@@ -25,7 +25,7 @@ Do not redistribute, property of JMLABS Sp. z o.o.**
 // M:3 - connect to server   
 // M:4 - post HTTP data to server   
   
-// S:text - set message to transmit via HTTP  
+// S:text - send text via SMS to predefined number  
   
 // V:0-1  will set verbose mode  
 // V:0 be quiet  
